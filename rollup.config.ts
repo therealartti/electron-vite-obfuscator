@@ -30,7 +30,7 @@ function clean(when: 'buildStart' | 'buildEnd', target: string): Plugin {
 
 export default defineConfig([
   {
-    input: ['src/index.ts', 'src/cli.ts'],
+    input: ['src/index.ts'],
     output: [
       {
         dir: 'dist',

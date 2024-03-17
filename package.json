@@ -1,6 +1,6 @@
 {
   "name": "electron-vite-obfuscator",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "Electron build tooling based on Vite",
   "type": "module",
   "main": "dist/index.cjs",
@@ -17,9 +17,6 @@
     },
     "./package.json": "./package.json"
   },
-  "bin": {
-    "electron-vite": "bin/electron-vite.js"
-  },
   "files": [
     "bin",
     "dist",
@@ -28,7 +25,6 @@
   "engines": {
     "node": "^18.0.0 || >=20.0.0"
   },
-  "packageManager": "pnpm@8.6.10",
   "author": "Arthur Gerster<https://github.com/therealartti>",
   "license": "ISC",
   "repository": {
@@ -49,7 +45,7 @@
     "format": "prettier --write .",
     "lint": "eslint --ext .ts src/**",
     "typecheck": "tsc --noEmit",
-    "build": "pnpm run lint && rollup -c rollup.config.ts --configPlugin typescript"
+    "build": "npm run lint && rollup -c rollup.config.ts --configPlugin typescript"
   },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged",
