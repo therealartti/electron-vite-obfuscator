@@ -199,6 +199,7 @@ export function bytecodePlugin(options: BytecodeOptions = {}): Plugin | null {
   let useInRenderer = false
   let bytecodeRequired = false
   let bytecodeFiles: { name: string; size: number }[] = []
+  const reservedStringsSet = new Set(obfuscationOptions?.reservedStrings || [])
 
   return {
     name: 'vite:bytecode',
@@ -262,10 +263,20 @@ export function bytecodePlugin(options: BytecodeOptions = {}): Plugin | null {
         }
 
         if (obfuscationOptions) {
+          chunk.imports.forEach(importedChunk => {
+            if (importedChunk.startsWith('chunks/') && !reservedStringsSet.has(importedChunk)) {
+              const lastIndex = importedChunk.lastIndexOf('-')
+              const baseName = lastIndex !== -1 ? importedChunk.substring(0, lastIndex + 1) : importedChunk
+              reservedStringsSet.add(baseName)
+            }
+          })
+
+          const reservedStrings = Array.from(reservedStringsSet)
           const obfuscatedResult = JavaScriptObfuscator.obfuscate(code, {
             ...obfuscationOptions,
             debugProtection: false,
-            selfDefending: false
+            selfDefending: false,
+            reservedStrings
           })
           code = obfuscatedResult.getObfuscatedCode()
         }
