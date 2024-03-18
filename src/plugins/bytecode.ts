@@ -9,13 +9,18 @@ import MagicString from 'magic-string'
 import type { SourceMapInput, OutputChunk } from 'rollup'
 import { getElectronPath } from '../electron'
 import { toRelativePath } from '../utils'
+import JavaScriptObfuscator, { ObfuscatorOptions } from 'javascript-obfuscator'
 
 // Inspired by https://github.com/bytenode/bytenode
 
 const _require = createRequire(import.meta.url)
 
 function getBytecodeCompilerPath(): string {
-  return path.join(path.dirname(_require.resolve('electron-vite/package.json')), 'bin', 'electron-bytecode.cjs')
+  return path.join(
+    path.dirname(_require.resolve('electron-vite-obfuscator/package.json')),
+    'bin',
+    'electron-bytecode.cjs'
+  )
 }
 
 function compileToBytecode(code: string): Promise<Buffer> {
@@ -146,6 +151,7 @@ export interface BytecodeOptions {
   transformArrowFunctions?: boolean
   removeBundleJS?: boolean
   protectedStrings?: string[]
+  obfuscationOptions?: ObfuscatorOptions | null
 }
 
 /**
@@ -156,7 +162,13 @@ export function bytecodePlugin(options: BytecodeOptions = {}): Plugin | null {
     return null
   }
 
-  const { chunkAlias = [], transformArrowFunctions = true, removeBundleJS = true, protectedStrings = [] } = options
+  const {
+    chunkAlias = [],
+    transformArrowFunctions = true,
+    removeBundleJS = true,
+    protectedStrings = [],
+    obfuscationOptions = null
+  } = options
   const _chunkAlias = Array.isArray(chunkAlias) ? chunkAlias : [chunkAlias]
 
   const filter = createFilter(/\.(m?[jt]s|[jt]sx)$/)
@@ -244,11 +256,21 @@ export function bytecodePlugin(options: BytecodeOptions = {}): Plugin | null {
       }
       if (chunk.type === 'chunk' && isBytecodeChunk(chunk.name)) {
         bytecodeRequired = true
+
         if (transformArrowFunctions) {
-          return {
-            code: _transform(code)
-          }
+          code = _transform(code)
         }
+
+        if (obfuscationOptions) {
+          const obfuscatedResult = JavaScriptObfuscator.obfuscate(code, {
+            ...obfuscationOptions,
+            debugProtection: false,
+            selfDefending: false
+          })
+          code = obfuscatedResult.getObfuscatedCode()
+        }
+
+        return { code }
       }
       return null
     },
