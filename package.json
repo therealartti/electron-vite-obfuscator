@@ -12,9 +12,6 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     },
-    "./node": {
-      "types": "./node.d.ts"
-    },
     "./package.json": "./package.json"
   },
   "files": [
@@ -92,7 +89,6 @@
   "dependencies": {
     "@babel/core": "^7.23.5",
     "@babel/plugin-transform-arrow-functions": "^7.23.3",
-    "cac": "^6.7.14",
     "esbuild": "^0.19.8",
     "javascript-obfuscator": "^4.1.0",
     "magic-string": "^0.30.5",
