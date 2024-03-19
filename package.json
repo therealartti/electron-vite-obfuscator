@@ -1,6 +1,6 @@
 {
   "name": "electron-vite-obfuscator",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0",
   "description": "Electron build tooling based on Vite",
   "type": "module",
   "main": "dist/index.cjs",
